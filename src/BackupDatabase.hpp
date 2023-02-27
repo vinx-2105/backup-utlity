@@ -1,13 +1,16 @@
 #ifndef BACKUP_CONFIG
 #define BACKUP_CONFIG
-#else 
 #include "BackupConfig.hpp"
 #endif
 
 #ifndef BACKUP
 #define BACKUP
-#else 
 #include "Backup.hpp"
+#endif
+
+#ifndef BACKUP_DATABASE
+#define BACKUP_DATABASE
+#include "BackupDatabase.hpp"
 #endif
 
 

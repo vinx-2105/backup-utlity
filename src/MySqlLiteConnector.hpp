@@ -4,15 +4,18 @@
 #include <vector>
 #ifndef BACKUP_CONFIG
 #define BACKUP_CONFIG
-#else 
 #include "BackupConfig.hpp"
 #endif
+
 #ifndef BACKUP
 #define BACKUP
-#else 
 #include "Backup.hpp"
 #endif
+
+#ifndef BACKUP_DATABASE
+#define BACKUP_DATABASE
 #include "BackupDatabase.hpp"
+#endif
 
 class MySqlLiteConnector : public BackupDatabase {
     private: 
@@ -117,11 +120,11 @@ class MySqlLiteConnector : public BackupDatabase {
             while (!done) {
                 switch (sqlite3_step (stmt)) {
                     case SQLITE_ROW:{
-                        char const* s1 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 1));
-                        char const* s2 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 2));
-                        char const* s3 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 3));
-                        char const* s4 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 4));
-                        char const* s7 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 7));
+                        const char* s1 = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+                        const char* s2 = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+                        const char* s3 = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
+                        const char* s4 = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4));
+                        const char* s7 = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 7));
 
                         BackupConfig* bc = new BackupConfig(
                             sqlite3_column_int(stmt, 0),
@@ -301,6 +304,8 @@ class MySqlLiteConnector : public BackupDatabase {
                             sqlite3_column_int(stmt, 1),
                             s2, s3, s4, s5
                         );
+                        // backup->display();
+                        // backup->display();
                         (*backups)->push_back(backup);
                         row++;
                         break;
