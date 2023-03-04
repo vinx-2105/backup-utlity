@@ -5,13 +5,13 @@ class Backup {
     private:
         int id; 
         int backup_config_id; 
-        char const* start_dt; 
-        char const* end_dt; 
-        char const* path; 
-        char const* status; 
+        string start_dt; 
+        string end_dt; 
+        string path; 
+        string status; 
 
     public: 
-        Backup(int id, int backup_config_id, char const* start_dt, char const* end_dt, char const* path, char const* status){
+        Backup(int id, int backup_config_id, string start_dt, string end_dt, string path, string status){
             this->id = id; 
             this->backup_config_id = backup_config_id;
             this->start_dt = start_dt;
@@ -21,6 +21,6 @@ class Backup {
         }
 
         void display(){
-            printf("id: %d, backup_config_id: %d, start_dt: %s, end_dt: %s, path: %s, status: %s\n",  this->id, this->backup_config_id, this->start_dt, this->end_dt, this->path, this->status);
+            printf("id: %d, backup_config_id: %d, start_dt: %s, end_dt: %s, path: %s, status: %s\n",  this->id, this->backup_config_id, this->start_dt.c_str(), this->end_dt.c_str(), this->path.c_str(), this->status.c_str());
         }
 };

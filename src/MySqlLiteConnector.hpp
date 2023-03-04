@@ -108,11 +108,11 @@ class MySqlLiteConnector : public BackupDatabase {
             int res = sqlite3_open("test.db", &this->db);
             char *errMsg=0; 
             char query[1000];
-            int num_cols = 8;
+            // int num_cols = 8;
             int row = 0;
-            int bytes[num_cols]; 
+            // int bytes[num_cols]; 
             sqlite3_stmt* stmt;
-            const unsigned char* text[num_cols];
+            // const unsigned char* text[num_cols];
             *configs = new vector<BackupConfig*>();
             sprintf(query, "SELECT * FROM Backup_Configs");
             sqlite3_prepare(this->db, query, sizeof(query), &stmt, NULL);
@@ -120,12 +120,12 @@ class MySqlLiteConnector : public BackupDatabase {
             while (!done) {
                 switch (sqlite3_step (stmt)) {
                     case SQLITE_ROW:{
-                        const char* s1 = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-                        const char* s2 = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
-                        const char* s3 = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
-                        const char* s4 = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4));
-                        const char* s7 = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 7));
-
+                        string s1 = string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1)));
+                        string s2 = string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2)));
+                        string s3 = string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3)));
+                        string s4 = string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4)));
+                        const char* c7 = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 7));
+                        string s7 = c7==NULL ? string("NULL") : string(c7);
                         BackupConfig* bc = new BackupConfig(
                             sqlite3_column_int(stmt, 0),
                             s1, s2, s3, s4,
@@ -148,6 +148,7 @@ class MySqlLiteConnector : public BackupDatabase {
             }
             sqlite3_finalize(stmt);
             sqlite3_close(this->db);
+            printf("DB connection closed\n");
             return 0;
         }
 
@@ -166,12 +167,12 @@ class MySqlLiteConnector : public BackupDatabase {
             while (!done) {
                 switch (sqlite3_step (stmt)) {
                     case SQLITE_ROW:{
-                        char const* s1 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 1));
-                        char const* s2 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 2));
-                        char const* s3 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 3));
-                        char const* s4 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 4));
-                        char const* s7 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 7));
-
+                        string s1 = string(reinterpret_cast<char const *>(sqlite3_column_text(stmt, 1)));
+                        string s2 = string(reinterpret_cast<char const *>(sqlite3_column_text(stmt, 2)));
+                        string s3 = string(reinterpret_cast<char const *>(sqlite3_column_text(stmt, 3)));
+                        string s4 = string(reinterpret_cast<char const *>(sqlite3_column_text(stmt, 4)));
+                        const char* c7 = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 7));
+                        string s7 = c7==NULL ? string("NULL") : string(c7);
                         *backup_config = new BackupConfig(
                             sqlite3_column_int(stmt, 0),
                             s1, s2, s3, s4,
@@ -179,7 +180,6 @@ class MySqlLiteConnector : public BackupDatabase {
                             sqlite3_column_int(stmt, 6),
                             s7
                         );
-                        return 0;
                         break;
                     }
                     case SQLITE_DONE:
@@ -193,16 +193,26 @@ class MySqlLiteConnector : public BackupDatabase {
             }
             sqlite3_finalize(stmt);
             sqlite3_close(this->db);
-            return -1;
+            return 0;
         }
 
-        int create_backup(const int backup_config_id, const char* start_dt, const char* path, const char* status) {
+        int create_backup(const int backup_config_id, const char* start_dt, const char* path) {
             int res = sqlite3_open("test.db", &this->db);
             char *errMsg=0; 
             char query[1000];
-            sprintf(query, "INSERT INTO Backups (backup_config_id, start_dt, path, status) VALUES ('%d', '%s', '%s', '%s')", backup_config_id, start_dt, path, status);
+            const char* status="init";
+            char* base_dt;
+            time_t current_time;
+            current_time = time(NULL);
+            base_dt = strtok(ctime(&current_time), "\n");;
+            printf("create backup backup_config_id:::%d\n", backup_config_id);
+            printf("create backup start_dt:::%s\n", base_dt);
+            printf("create backup path:::%s\n", path);
+            printf("create backup status:::%s\n", status);
+            sprintf(query, "INSERT INTO Backups (backup_config_id, start_dt, path, status) VALUES ('%d', '%s', '%s', '%s')", backup_config_id, base_dt, path, status);
+            printf("create backup query:::%s\n", query);
             res = sqlite3_exec(this->db, query, this->callback, 0, &errMsg);
-            if(res!=SQLITE_OK ){
+            if(res!=SQLITE_OK){
                 fprintf(stderr, "SQL error: %s\n", errMsg);
                 sqlite3_free(errMsg);
             } else {
@@ -248,17 +258,21 @@ class MySqlLiteConnector : public BackupDatabase {
             while (!done) {
                 switch (sqlite3_step (stmt)) {
                     case SQLITE_ROW:{
-                        char const* s2 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 2));
-                        char const* s3 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 3));
-                        char const* s4 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 4));
-                        char const* s5 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 5));
+                        char const* c2 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 2));
+                        char const* c3 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 3));
+                        char const* c4 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 4));
+                        char const* c5 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 5));
+
+                        string s2 = c2==NULL ? string("NULL") : string(c2);
+                        string s3 = c3==NULL ? string("NULL") : string(c3);
+                        string s4 = c4==NULL ? string("NULL") : string(c4);
+                        string s5 = c5==NULL ? string("NULL") : string(c5);
 
                         *backup = new Backup(
                             sqlite3_column_int(stmt, 0),
                             sqlite3_column_int(stmt, 1),
                             s2, s3, s4, s5
                         );
-                        return 0;
                         break;
                     }
                     case SQLITE_DONE:
@@ -272,7 +286,7 @@ class MySqlLiteConnector : public BackupDatabase {
             }
             sqlite3_finalize(stmt);
             sqlite3_close(this->db);
-            return -1;
+            return 0;
         }
 
         int get_backups_by_config(vector<Backup*>** backups, int backup_config_id){
@@ -291,14 +305,16 @@ class MySqlLiteConnector : public BackupDatabase {
             while (!done) {
                 switch (sqlite3_step (stmt)) {
                     case SQLITE_ROW:{
-                        char const* s2 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 2));
-                        char const* s3 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 3));
-                        char const* s4 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 4));
-                        char const* s5 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 5));
-                        printf("s2: %s\n", s2);
-                        printf("s3: %s\n", s3);
-                        printf("s4: %s\n", s4);
-                        printf("s5: %s\n", s5);
+                        char const* c2 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 2));
+                        char const* c3 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 3));
+                        char const* c4 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 4));
+                        char const* c5 = reinterpret_cast<char const *>(sqlite3_column_text(stmt, 5));
+
+                        string s2 = c2==NULL ? string("NULL") : string(c2);
+                        string s3 = c3==NULL ? string("NULL") : string(c3);
+                        string s4 = c4==NULL ? string("NULL") : string(c4);
+                        string s5 = c5==NULL ? string("NULL") : string(c5);
+
                         Backup *backup = new Backup(
                             sqlite3_column_int(stmt, 0),
                             sqlite3_column_int(stmt, 1),

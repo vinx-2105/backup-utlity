@@ -8,7 +8,7 @@ using namespace std;
 class BackupState { 
     private:
         int backup_id; 
-        vector<tuple<string, string, int> > files; //path of the file, last modified datetime, last_backup_id in which file was changed
+        vector<tuple<const char*, const char*, int> > files; //path of the file, last modified datetime, last_backup_id in which file was changed
 
     public: 
         int load_from_file(const char* path){
@@ -20,18 +20,20 @@ class BackupState {
                 string path = array[0];
                 string last_modified_dt = array[1];
                 int last_backup_id = array[2];
-                this->files.push_back(tuple<string, string, int> (path, last_modified_dt, last_backup_id));
+                this->files.push_back(tuple<const char*, const char*, int> (path.c_str(), last_modified_dt.c_str(), last_backup_id));
             }
             return 0;
         }
 
-        int save(int backup_id, const char* path, vector<tuple<string, string, int> >& files){
+        int save_new(int backup_id, const char* path, vector<tuple<const char*, const char*, int> >& files){
+            printf("save_new:::backup_id%d\n", backup_id);
+            printf("save_new:::path%s\n", path);
+            printf("files[0]:::files[0]%s\n", );
             nlohmann::json data ;
             data["backup_id"]=backup_id;
             data["files"]=files;
             ofstream o(path);
             o << setw(4) << data << endl;
             return 0;
-        }
-
+        }        
 };
