@@ -1,4 +1,4 @@
-# os-backup-utlity
+# backup-utlity
 
 A program which provides a file backup utlility. The utility needs to provide for 2 kinds of backups -
 
