@@ -148,7 +148,7 @@ class MySqlLiteConnector : public BackupDatabase {
             }
             sqlite3_finalize(stmt);
             sqlite3_close(this->db);
-            printf("DB connection closed\n");
+            // printf("DB connection closed\n");
             return 0;
         }
 
@@ -201,16 +201,11 @@ class MySqlLiteConnector : public BackupDatabase {
             char *errMsg=0; 
             char query[1000];
             const char* status="init";
-            char* base_dt;
-            time_t current_time;
-            current_time = time(NULL);
-            base_dt = strtok(ctime(&current_time), "\n");;
-            printf("create backup backup_config_id:::%d\n", backup_config_id);
-            printf("create backup start_dt:::%s\n", base_dt);
-            printf("create backup path:::%s\n", path);
-            printf("create backup status:::%s\n", status);
-            sprintf(query, "INSERT INTO Backups (backup_config_id, start_dt, path, status) VALUES ('%d', '%s', '%s', '%s')", backup_config_id, base_dt, path, status);
-            printf("create backup query:::%s\n", query);
+            // printf("create backup backup_config_id:::%d\n", backup_config_id);
+            // printf("create backup path:::%s\n", path);
+            // printf("create backup status:::%s\n", status);
+            sprintf(query, "INSERT INTO Backups (backup_config_id, start_dt, path, status) VALUES ('%d', '%s', '%s', '%s')", backup_config_id, start_dt, path, status);
+            // printf("create backup query:::%s\n", query);
             res = sqlite3_exec(this->db, query, this->callback, 0, &errMsg);
             if(res!=SQLITE_OK){
                 fprintf(stderr, "SQL error: %s\n", errMsg);
@@ -237,9 +232,7 @@ class MySqlLiteConnector : public BackupDatabase {
             if(res!=SQLITE_OK ){
                 fprintf(stderr, "SQL error: %s\n", errMsg);
                 sqlite3_free(errMsg);
-            } else {
-                printf("Updated backup in db\n");
-            }
+            } 
             sqlite3_close(this->db);
         };
 

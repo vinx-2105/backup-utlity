@@ -34,7 +34,8 @@ class BackupConfig {
         }
 
         void display(){
-            printf("id: %d, src_path: %s, dest_path: %s, mode: %s, base_dt: %s, full_frequency: %d, part_frequency: %d\n",  this->id,this->src_path.c_str(), this->dest_path.c_str(), this->mode.c_str(), this->base_dt.c_str(), this->full_frequency, this->part_frequency);
+            // printf("id: %d, src_path: %s, dest_path: %s, mode: %s, base_dt: %s, full_frequency: %d, part_frequency: %d\n",  this->id,this->src_path.c_str(), this->dest_path.c_str(), this->mode.c_str(), this->base_dt.c_str(), this->full_frequency, this->part_frequency);
+            printf("id: %d, src_path: %s, dest_path: %s, base_dt: %s\n",  this->id,this->src_path.c_str(), this->dest_path.c_str(), this->base_dt.c_str());
         }
 
         bool validate_src(){

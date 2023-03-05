@@ -3,7 +3,6 @@
 #include "MySqlLiteConnector.hpp"
 #endif
 
-
 #ifndef BACKUP_STATE
 #define BACKUP_STATE
 #include "BackupState.hpp"
@@ -39,25 +38,73 @@
 using namespace std; 
 
 int main (){
-    MySqlLiteConnector db_connector;
-    const char* base_dt = curr_time_string();
-    printf("base_dt: %s.....\n", base_dt);
-    const char* src_path="/Users/vineet/Desktop";
-    const char* dest_path="/Users/vineet/Desktop";
+    //driver program
+    //1. create a new backup config
+    //2. display all backup_configs
+    //3. display all backups given a backup_config_id
+    //4. do a full backup while inputing a  backup_config_id
+    //5. resume a previous backup which was not completed before
+    //6. incremental backup - backs up only those files which have been changed since the last full backup
+
+    // const char* src_path="/Users/vineet/Desktop";///these params in backup config are all hardcoded for now
+    // const char* dest_path="/Users/vineet/Desktop";
     const char* mode="full";
-    // const char* backup_status="init";
-    // const char* backup_status_2="completed";
     const int full_frequency=20;
     const int part_frequency=6;
-    // const char* curr_time = curr_time_string();
-    // db_connector.create_backup_config(src_path, dest_path, mode, base_dt, full_frequency, part_frequency);
 
-    BackupController backup_controller(&db_connector);
-    backup_controller.list_all_backup_configs();
-    backup_controller.do_full_backup(1);
-    // bs.load_from_file("a.json");
-    // vector<tuple<string, string, int> > files; 
-    // files.push_back(tuple<string, string, int>("file_path_here2", "datetime2_here", 3));
-    // bs.save(1, "b.json", files);
+    MySqlLiteConnector db_connector;
+    BackupController bc(&db_connector); 
 
+    while (true){
+        printf("\nSelect a command...\n");
+        int mode;
+        printf("<1> Create a new backup config\n");
+        printf("<2> Display all backup configs\n");
+        printf("<3> Display all backups given a backup_config_id\n");
+        printf("<4> Take a full backup given a valid backup_config_id\n");
+        printf("<5> Resume a previously incompleted backup\n");
+        printf("<6> Take a incremental backup given a backup_config_id\n");
+
+        cin>>mode; 
+
+        if (mode==1){
+            printf("\tSpecify the path of the dir to be backed up (like /Users/vineet/Desktop): \n");
+            string src_path; 
+            cin>>src_path; 
+            db_connector.create_backup_config(src_path.c_str(), src_path.c_str(), "full", curr_time_string().c_str(), full_frequency, part_frequency);
+        }
+        else if(mode==2){
+            printf("\tAll backup configs:\n");
+            bc.list_all_backup_configs();
+        }
+        else if (mode==3){
+            printf("\tSpecify the backup_config_id:\n");
+            int backup_config_id; 
+            cin>>backup_config_id;
+            bc.list_all_backups_by_backup_config_id(backup_config_id);
+            
+        }
+        else if (mode==4){//take a full backup given a backup_config_id
+            printf("\tSpecify the backup_config_id:\n");
+            int backup_config_id; 
+            cin>>backup_config_id;
+            bc.do_full_backup(backup_config_id);
+        }
+        else if (mode==5){
+            printf("\tSpecify the backup_id:\n");
+            int backup_id; 
+            cin>>backup_id; 
+            bc.resume_backup(backup_id);
+        }
+        else if(mode==6){
+            printf("\tSpecify the backup_config_id:\n");
+            int backup_config_id; 
+            cin>>backup_config_id;
+            bc.do_incremental_backup(backup_config_id);
+        }
+        else {
+            printf("Invalid command selected...");
+            continue;
+        }
+    }
 }
