@@ -5,7 +5,7 @@ A program which provides a file backup utlility. The utility needs to provide fo
 1. Full
 2. Incremental
 
-The project is currently very limited in its scope - 
+The project's scope is - 
 
 1. Uses a SQLite backend to save data about backup configs and backups
 2. Allows taking a simple full backup of a directory
@@ -16,3 +16,17 @@ The project is currently very limited in its scope -
    1. Backups only simple files located in the root level of a directory
    2. Does not handle file deletion
    3. Functionalities have to be triggered manually
+   
+   
+#### Build instructions
+
+1. `mkdir build` (at the same level as src)
+2. `cd build`
+3. `cmake ..`
+4. `make`
+5. `./BackupUtility` is the target executable. Simply run the executbale to open the interactive cli interface.
+
+### Development Environment
+1. CMake: 3.23.2
+2. OS: macOS 12.4
+3. Compiler: Apple clang version 13.0.0 with arm64-apple-darwin21.5.0 target
